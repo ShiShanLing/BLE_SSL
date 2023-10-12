@@ -18,12 +18,23 @@ Page({
   Send: function () {
     var that = this
     if (that.data.connected) {
-      var buffer = new ArrayBuffer(that.data.inputText.length)
+			//拍照 11
+			//按键 0-2 ? 为什么是三个按钮
+			//单击
+			let click = "11"
+			//双击
+			let doubleClick = "CC"
+			//长按
+			let longPress  = "DD"
+			let key = "01"
+			let codedingStr = `0xA1 0x21 LEN ${key} ${func} ${doubleClick} ${longPress} 00 00 00 00 00 00 00 00 00 00 00 00 CRC`
+			//0xA1 0x21 LEN 01 11 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CRC
+      var buffer = new ArrayBuffer(codedingStr)
       var dataView = new Uint8Array(buffer)
       for (var i = 0; i < that.data.inputText.length; i++) {
         dataView[i] = that.data.inputText.charCodeAt(i)
       }
-
+			//发送数据
       wx.writeBLECharacteristicValue({
         deviceId: that.data.connectedDeviceId,
         serviceId: that.data.services[0].uuid,
