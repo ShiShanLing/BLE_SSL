@@ -6,5 +6,6 @@
   <input class="input" value="{{inputText}}" bindinput="bindInput" maxlength="20"/>
   <text style="font-size:medium;margin-top:10px">接收内容：</text>
   <input class="input" disabled value="{{receiveText}}" maxlength="20"/>
-  <button type="primary" class="button" bindtap="Send">发送</button>
+  <button type="primary" class="button1" bindtap="Send">发送</button>
+  <button type="primary" class="button" bindtap="CloseBLEConnection">断开蓝牙</button>
 </view>

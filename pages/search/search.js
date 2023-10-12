@@ -78,9 +78,12 @@ Page({
     wx.showLoading({
       title: '连接蓝牙设备中...',
 		})
-		//开始链接
+    //开始链接
+    //4DA926D6-0A9B-6C89-5B8D-CA5660D04C01
+    //4DA926D6-0A9B-6C89-5B8D-CA5660D04C01
+    let deviceId = "4DA926D6-0A9B-6C89-5B8D-CA5660D04C01";
     wx.createBLEConnection({
-      deviceId: e.currentTarget.id,
+      deviceId: deviceId,
       success: function (res) {
         console.log(res)
         wx.hideLoading()
@@ -90,7 +93,7 @@ Page({
           duration: 1000
         })
         wx.navigateTo({
-          url: '../device/device?connectedDeviceId=' + e.currentTarget.id + '&name=' + name
+          url: '../device/device?connectedDeviceId=' + deviceId + '&name=' + "Pencli"
         })
       },
       fail: function (res) {

@@ -11,6 +11,11 @@ page {
   border: 1px solid lightgray;
   border-radius: 6px;
 }
+.button1 {
+  position: fixed;
+  width: 690rpx;
+  bottom: 130rpx;
+}
 .button {
   position: fixed;
   width: 690rpx;
