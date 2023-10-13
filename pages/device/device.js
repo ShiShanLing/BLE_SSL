@@ -21,38 +21,41 @@ Page({
   Send: function () {
     var that = this
     if (that.data.connected) {
+			let key = "01"
 			//拍照 11
 			//按键 0-2 ? 为什么是三个按钮
 			//单击
-			let click = "00"//BB
+			let click = "11"
+			//十进制转16进制
+			const clickHex = Number(click).toString(16);
 			//双击
-			let doubleClick = "11"
-			//长按S
-			let longPress  = "00"//DD
-			let key = "01"
-      // var codedingStr = `0xA10x21LEN${key}${click}${doubleClick}${longPress}000000000000000000000000CRC`
-      let codedingStr = `0xA1 0x21 LEN ${key} ${func} ${doubleClick} ${longPress} 00 00 00 00 00 00 00 00 00 00 00 00 CRC`
-      console.log("codedingStr==", codedingStr);
-			//0xA1 0x21 LEN 01 11 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CRC
-      var buffer = new ArrayBuffer(codedingStr)
-      var dataView = new Uint8Array(buffer)
-      for (var i = 0; i <codedingStr; i++) {
-        dataView[i] = codedingStr.charCodeAt(i)
-      }
+			let doubleClick = "00"
+			const doubleClickHex = Number(doubleClick).toString(16);
+			//长按
+			let longPress  = "00"
+			const longPressHex = Number(longPress).toString(16);
+			console.log(`clickHex=${clickHex} doubleClickHex=${doubleClickHex} longPressHex=${longPressHex}`);
+			let codedingsOne = ['A1', '21', '00', key, clickHex, doubleClickHex, longPressHex, '00', '00', '00', '00','00', '00', '00', '00', '00', '00', '00', '00', 'FF'];
+			//计算3-18
+			let total = 0
+			for (let index = 3; index < 19; index++) {
+				let tn = Number('0x'+codedingsOne[index])
+				total += tn;
+				console.log('十进制', tn);
+			}
+			console.log("总大小应该是12---", total);
+			codedingsOne[19] = total.toString(16)
+ //看样子这个可以,--
+ 			let oneAB = hexStrToBuf(codedingsOne);
+			console.log("看样子这个可以---oneAB=", oneAB);
 
-      // let arrayBuffer = that.string2buffer(codedingStr)
-      // that.getUint8Value(codedingStr, (data)=>{
-      //     console.log("getUint8Value:", data);
-      // })
-      // console.log("arrayBuffer==", arrayBuffer);
-      // console.log("dataView.buffer==", dataView.buffer);
-      //发送数据
-      console.log("  that.data.connectedDeviceId:",   that.data.connectedDeviceId, "that.data.serviceId:", that.data.serviceId, "that.data.characteristicId:",that.data.characteristicId);
+			//发送数据
       wx.writeBLECharacteristicValue({
         deviceId: that.data.connectedDeviceId,
-        serviceId: that.data.serviceId,
-        characteristicId: that.data.characteristicId,
-        value:  stringToArrayBuffer(codedingStr),
+        serviceId: that.data.services[0].uuid,
+        characteristicId: that.data.characteristics[0].uuid,
+        value: oneAB,
+
         success: function (res) {
           if (res.errCode != 0){
             wx.showModal({
@@ -221,31 +224,15 @@ Page({
   }
 })
 
-function stringToArrayBuffer(str) {
-  var bytes = new Array();
-  var len, c;
-  len = str.length;
-  for (var i = 0; i < len; i++) {
-    c = str.charCodeAt(i);
-    if (c >= 0x010000 && c <= 0x10FFFF) {
-      bytes.push(((c >> 18) & 0x07) | 0xF0);
-      bytes.push(((c >> 12) & 0x3F) | 0x80);
-      bytes.push(((c >> 6) & 0x3F) | 0x80);
-      bytes.push((c & 0x3F) | 0x80);
-    } else if (c >= 0x000800 && c <= 0x00FFFF) {
-      bytes.push(((c >> 12) & 0x0F) | 0xE0);
-      bytes.push(((c >> 6) & 0x3F) | 0x80);
-      bytes.push((c & 0x3F) | 0x80);
-    } else if (c >= 0x000080 && c <= 0x0007FF) {
-      bytes.push(((c >> 6) & 0x1F) | 0xC0);
-      bytes.push((c & 0x3F) | 0x80);
-    } else {
-      bytes.push(c & 0xFF);
-    }
+
+
+// hex转ArrayBuffer
+function hexStrToBuf(arr) {
+  var length = arr.length
+  var buffer = new ArrayBuffer(length)
+  var dataview = new DataView(buffer)
+  for (let i = 0; i < length; i++) {
+    dataview.setUint8(i, '0x' + arr[i])
   }
-  var array = new Int8Array(bytes.length);
-  for (var i = 0; i <= bytes.length; i++) {
-    array[i] = bytes[i];
-  }
-  return array.buffer;
-  }
+  return buffer
+}
