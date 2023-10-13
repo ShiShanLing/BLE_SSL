@@ -76,10 +76,12 @@ Page({
     })
     wx.showLoading({
       title: '连接蓝牙设备中...',
-    })
+		})
+		let dev = "4DA926D6-0A9B-6C89-5B8D-CA5660D04C01";
+		//e.currentTarget.id
     //开始链接
     wx.createBLEConnection({
-      deviceId: e.currentTarget.id,
+      deviceId: dev,
       success: function (res) {
         console.log(res)
         wx.hideLoading()
@@ -122,7 +124,7 @@ Page({
 		*/
 
 
-		let codedingsOne = ['A1', '21', 'LEN', '01', '11', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', , '00', '00', 'FF'];
+		let codedingsOne = ['A1', '21', '00', '01', '11', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00','00', '00', '00', '00', 'FF'];
 		//没有11这个字符串
 		let num1 = 1;
 		let num = 11;
@@ -302,11 +304,18 @@ function TypedArrays(Type, Bin, begin, Num) {
 function hexStrToBuf(arr) {
   var length = arr.length
   var buffer = new ArrayBuffer(length)
-  var dataview = new DataView(buffer)
+	// var dataview = new DataView(buffer)
+	var dataIntView = new Uint8Array(buffer)
   for (let i = 0; i < length; i++) {
-    dataview.setUint8(i, '0x' + arr[i])
-  }
-  return buffer
+		// dataview.setUint8(i, '0x' + arr[i])
+		dataIntView[i] = '0x' + arr[i]
+	}
+
+	console.log("Uint8Array==", dataIntView);
+	// console.log("DataView==", dataview);
+	console.log("buffer==", buffer);
+
+  return dataIntView
 }
 // ArrayBuffer转16进度字符串示例
 function abTohex(buffer) {

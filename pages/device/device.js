@@ -18,31 +18,40 @@ Page({
   Send: function () {
     var that = this
     if (that.data.connected) {
+			let key = "01"
 			//拍照 11
 			//按键 0-2 ? 为什么是三个按钮
 			//单击
 			let click = "11"
+			//十进制转16进制
+			const clickHex = Number(click).toString(16);
 			//双击
-			let doubleClick = "CC"
+			let doubleClick = "00"
+			const doubleClickHex = Number(doubleClick).toString(16);
 			//长按
-			let longPress  = "DD"
-			let key = "01"
+			let longPress  = "00"
+			const longPressHex = Number(longPress).toString(16);
+			console.log(`clickHex=${clickHex} doubleClickHex=${doubleClickHex} longPressHex=${longPressHex}`);
+			let codedingsOne = ['A1', '21', '00', key, clickHex, doubleClickHex, longPressHex, '00', '00', '00', '00','00', '00', '00', '00', '00', '00', '00', '00', 'FF'];
+			//计算3-18
+			let total = 0
+			for (let index = 3; index < 19; index++) {
+				let tn = Number('0x'+codedingsOne[index])
+				total += tn;
+				console.log('十进制', tn);
+			}
+			console.log("总大小应该是12---", total);
+			codedingsOne[19] = total.toString(16)
+ //看样子这个可以,--
+ 			let oneAB = hexStrToBuf(codedingsOne);
+			console.log("看样子这个可以---oneAB=", oneAB);
 
-
-			let codedingStr = `0xA1 0x21 LEN ${key} ${func} ${doubleClick} ${longPress} 00 00 00 00 00 00 00 00 00 00 00 00 CRC`
-		
-
-      var buffer = new ArrayBuffer(codedingStr)
-      var dataView = new Uint8Array(buffer)
-      for (var i = 0; i < that.data.inputText.length; i++) {
-        dataView[i] = that.data.inputText.charCodeAt(i)
-      }
 			//发送数据
       wx.writeBLECharacteristicValue({
         deviceId: that.data.connectedDeviceId,
         serviceId: that.data.services[0].uuid,
         characteristicId: that.data.characteristics[0].uuid,
-        value: buffer,
+        value: oneAB,
         success: function (res) {
           console.log('发送成功')
         }
@@ -126,3 +135,14 @@ Page({
   }
 })
 
+
+// hex转ArrayBuffer
+function hexStrToBuf(arr) {
+  var length = arr.length
+  var buffer = new ArrayBuffer(length)
+  var dataview = new DataView(buffer)
+  for (let i = 0; i < length; i++) {
+    dataview.setUint8(i, '0x' + arr[i])
+  }
+  return buffer
+}
