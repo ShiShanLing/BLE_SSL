@@ -27,8 +27,11 @@ Page({
 			//长按
 			let longPress  = "DD"
 			let key = "01"
+
+
 			let codedingStr = `0xA1 0x21 LEN ${key} ${func} ${doubleClick} ${longPress} 00 00 00 00 00 00 00 00 00 00 00 00 CRC`
-			//0xA1 0x21 LEN 01 11 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CRC
+		
+
       var buffer = new ArrayBuffer(codedingStr)
       var dataView = new Uint8Array(buffer)
       for (var i = 0; i < that.data.inputText.length; i++) {
@@ -122,3 +125,4 @@ Page({
 
   }
 })
+
