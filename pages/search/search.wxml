@@ -9,7 +9,9 @@
         </view>
         <image style="width:36px;height:36px" mode="aspectFit" src="/images/bluetooth.png"></image>
       </view>
-    </block>
+    </block> 
   </scroll-view>
+	<button type="primary" class="button1" bindtap="onCollPencli">直接连接Pencli</button>
   <button type="primary" class="button" loading="{{searching}}" bindtap="Search">{{searching?"搜索中...":"搜索蓝牙设备"}}</button>
+	
 </view>

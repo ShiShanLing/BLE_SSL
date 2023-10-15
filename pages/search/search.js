@@ -78,11 +78,12 @@ Page({
       title: '连接蓝牙设备中...',
 		})
 
-		let dev = "4DA926D6-0A9B-6C89-5B8D-CA5660D04C01";
+		let deviceId = "A61C1976-6952-E862-632F-2B05017C6621";
+		// let deviceId = e.currentTarget.id;
 		//e.currentTarget.id
     //开始链接
     wx.createBLEConnection({
-      deviceId: dev,
+      deviceId: deviceId,
       success: function (res) {
         console.log(res)
         wx.hideLoading()
@@ -105,7 +106,37 @@ Page({
         })
       }
     })
-  },
+	},
+	onCollPencli(){
+		let deviceId = "A61C1976-6952-E862-632F-2B05017C6621";
+		// let deviceId = e.currentTarget.id;
+		//e.currentTarget.id
+    //开始链接
+    wx.createBLEConnection({
+      deviceId: deviceId,
+      success: function (res) {
+        console.log(res)
+        wx.hideLoading()
+        wx.showToast({
+          title: '连接成功',
+          icon: 'success',
+          duration: 1000
+        })
+        wx.navigateTo({
+          url: '../device/device?connectedDeviceId=' + deviceId + '&name=' + "Pencli"
+        })
+      },
+      fail: function (res) {
+        console.log(res)
+        wx.hideLoading()
+        wx.showModal({
+          title: '提示',
+          content: '连接失败',
+          showCancel: false
+        })
+      }
+    })
+	},
   onLoad: function (options) {
     /*
     思路1:吧字符串转 Buffer 发送过去.

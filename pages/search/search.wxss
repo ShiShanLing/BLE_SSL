@@ -25,3 +25,8 @@ page {
   width: 690rpx;
   bottom: 30rpx;
 }
+.button1 {
+  position: fixed;
+  width: 690rpx;
+  bottom: 130rpx;
+}

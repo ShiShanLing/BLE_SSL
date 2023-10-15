@@ -45,34 +45,149 @@ Page({
 			}
 			console.log("总大小应该是12---", total);
 			codedingsOne[19] = total.toString(16)
+			console.log("修改后的codedingsOne==", codedingsOne);
  //看样子这个可以,--
- 			let oneAB = hexStrToBuf(codedingsOne);
+			let tempArray = []
+			//十进制的数组
+			for (let index = 0; index < codedingsOne.length; index++) {
+				const element = codedingsOne[index];
+				tempArray.push(Number('0x'+element))
+			}
+			console.log("tempArray==", tempArray);
+ 			let oneAB = hexStrToBuf(tempArray);
 			console.log("看样子这个可以---oneAB=", oneAB);
 
 			//发送数据
-      wx.writeBLECharacteristicValue({
-        deviceId: that.data.connectedDeviceId,
-        serviceId: that.data.services[0].uuid,
-        characteristicId: that.data.characteristics[0].uuid,
-        value: oneAB,
+			console.log(`deviceId:${that.data.connectedDeviceId} serviceId:${that.data.serviceId} characteristicId:${that.data.characteristicId}`);
 
-        success: function (res) {
-          if (res.errCode != 0){
-            wx.showModal({
-              title: '提示',
-              content: `发送失败:${res.errno}, ${res.errMsg}`,
-              showCancel: false,
-              success: function (res) {
-                that.setData({
-                  searching: false
-                })
-              }
-            })
-          }
-          console.log('发送成功', res)
-        }
-      })
+			let codedingStr = `0xA1 0x21 LEN ${key} ${key} ${doubleClick} ${longPress} 00 00 00 00 00 00 00 00 00 00 00 00 CRC`
+     // var codedingStr = `0xA10x21LEN${key}${click}${doubleClick}${longPress}000000000000000000000000CRC`
+   
+      console.log("codedingStr==", codedingStr);
+ 			//0xA1 0x21 LEN 01 11 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CRC
+       var buffer = new ArrayBuffer(codedingStr)
+       var dataView = new Uint8Array(buffer)
+      
+      for (var i = 0; i <codedingStr; i++) {
+        dataView[i] = codedingStr.charCodeAt(i)
+       }
+			 console.log("buffer==", buffer);
 
+			 let test_buffer = new ArrayBuffer(20)
+			 let test_dataView = new DataView(test_buffer)
+			 test_dataView.setUint8(0, 161)
+			 test_dataView.setUint8(1, 33)
+			 test_dataView.setUint8(2, 0)
+			 test_dataView.setUint8(3, 1)
+			 test_dataView.setUint8(4, 11)
+			 test_dataView.setUint8(5, 0)
+			 test_dataView.setUint8(6, 0)
+			 test_dataView.setUint8(7, 0)
+			 test_dataView.setUint8(8, 0)
+			 test_dataView.setUint8(9, 0)
+			 test_dataView.setUint8(10, 0)
+			 test_dataView.setUint8(11, 0)
+			 test_dataView.setUint8(12, 0)
+			 test_dataView.setUint8(13, 0)
+			 test_dataView.setUint8(14, 0)
+			 test_dataView.setUint8(15, 0)
+			 test_dataView.setUint8(16, 0)
+			 test_dataView.setUint8(17, 0)
+			 test_dataView.setUint8(18, 0)
+			 test_dataView.setUint8(19, 12)
+			 console.log("test_buffer=", test_buffer);
+			 console.log("test_buffer.byteLength=", test_buffer.byteLength);
+			//  let tmpBuffer = test_buffer.slice(0, 0 + 10);
+			//  console.log("tmpBuffer==", tmpBuffer);
+			let order = utils.stringToBytes(orderStr);
+			 var bytes = test_buffer.byteLength;
+			 let pos = 0;
+			 while (bytes > 0) {
+				let tmpBuffer;
+				if (bytes >= 10) {
+					tmpBuffer = test_buffer.slice(pos, pos + 10);
+					pos += 10;
+					bytes -= 10;
+					console.log("tmpBuffer=", tmpBuffer);
+					wx.writeBLECharacteristicValue({
+						deviceId: that.data.connectedDeviceId,
+						serviceId: that.data.serviceId,
+						characteristicId: that.data.characteristicId,
+						value: tmpBuffer,
+						// writeType:"writeNoResponse",
+						success: function (res) {
+							if (res.errCode != 0){
+								wx.showModal({
+									title: '提示',
+									content: `发送失败:${res.errno}, ${res.errMsg}`,
+									showCancel: false,
+									success: function (res) {
+										that.setData({
+											searching: false
+										})
+									}
+								})
+							}
+							console.log('test_dataView发送成功', res)
+						},
+						fail: function(error) {
+							console.log("test_dataView发送失败", error);
+						}
+					})
+				}
+			}
+			
+			//  //BLECharacteristic
+      // wx.writeBLECharacteristicValue({
+      //   deviceId: that.data.connectedDeviceId,
+      //   serviceId: that.data.serviceId,
+      //   characteristicId: that.data.characteristicId,
+			// 	value: test_buffer,
+			// 	// writeType:"writeNoResponse",
+      //   success: function (res) {
+      //     if (res.errCode != 0){
+      //       wx.showModal({
+      //         title: '提示',
+      //         content: `发送失败:${res.errno}, ${res.errMsg}`,
+      //         showCancel: false,
+      //         success: function (res) {
+      //           that.setData({
+      //             searching: false
+      //           })
+      //         }
+      //       })
+      //     }
+      //     console.log('test_dataView发送成功', res)
+			// 	},
+			// 	fail: function(error) {
+			// 		console.log("test_dataView发送失败", error);
+			// 	}
+			// })
+			// wx.writeBLECharacteristicValue({
+      //   deviceId: that.data.connectedDeviceId,
+      //   serviceId: that.data.serviceId,
+      //   characteristicId: that.data.characteristicId,
+			// 	value: test_buffer2,
+			// 	// writeType:"writeNoResponse",
+      //   success: function (res) {
+      //     if (res.errCode != 0){
+      //       wx.showModal({
+      //         title: '提示',
+      //         content: `发送失败:${res.errno}, ${res.errMsg}`,
+      //         showCancel: false,
+      //         success: function (res) {
+      //           that.setData({
+      //             searching: false
+      //           })
+      //         }
+      //       })
+      //     }
+      //     console.log('test_dataView2发送成功', res)
+			// 	},
+			// 	fail: function(error) {
+			// 		console.log("test_dataView2发送失败", error);
+			// 	}
+      // })
    
     }
     else {
@@ -130,11 +245,11 @@ Page({
   onLoad: function (options) {
     var that = this
     console.log(options)
-    console.log("stringToArrayBuffer", stringToArrayBuffer("0xA10x21LEN01001100000000000000000000000000CRC"));
     that.setData({
       name: options.name,
       connectedDeviceId: options.connectedDeviceId
-    })
+		})
+		console.log("that.data.connectedDeviceId=", that.data.connectedDeviceId);
     wx.getBLEDeviceServices({
       deviceId: that.data.connectedDeviceId,
       success: function (res) {
@@ -146,7 +261,7 @@ Page({
         for (let index = 0; index < res.services.length; index++) {
           const element = res.services[index];
           
-         
+         console.log("options.connectedDeviceId:", options.connectedDeviceId);
           wx.getBLEDeviceCharacteristics({
             deviceId: options.connectedDeviceId,
             serviceId:element.uuid,
@@ -160,11 +275,11 @@ Page({
               })
               res.characteristics.forEach((data)=>{
                
-                // console.log(`打印他的值notify:${data.properties.notify ? 'true':'false'} \nread:${data.properties.read ?  'true':'false'} \nwrite:${data.properties.write ? 'true':'false'}`);
+                console.log(`打印他的值notify:${data.properties.notify ? 'true':'false'} \nread:${data.properties.read ?  'true':'false'} \nwrite:${data.properties.write ? 'true':'false'}`);
                 if(data.properties.notify&&data.properties.read&&data.properties.write){
                    console.log(" element.uuid:",  element.uuid, "data.uuid:", data.uuid, "options.connectedDeviceId:", options.connectedDeviceId);
                   console.log("AddNotify");
-                  
+									console.log(`connectedDeviceId:${options.connectedDeviceId}`);
                   that.setData({
                     serviceId: element.uuid,
                     characteristicId:data.uuid
@@ -189,7 +304,8 @@ Page({
       })
     })
     wx.onBLECharacteristicValueChange(function (res) {
-      var receiveText = app.buf2string(res.value)
+			var receiveText = app.buf2string(res.value)
+			console.log("res.value", res.value);
       console.log('接收到数据：' + receiveText)
       that.setData({
         receiveText: receiveText
@@ -230,9 +346,14 @@ Page({
 function hexStrToBuf(arr) {
   var length = arr.length
   var buffer = new ArrayBuffer(length)
-  var dataview = new DataView(buffer)
+	var dataview = new DataView(buffer)
+	var dataIntView = new Uint8Array(buffer)
   for (let i = 0; i < length; i++) {
-    dataview.setUint8(i, '0x' + arr[i])
+		dataview.setUint8(i,arr[i])
+		
+		// dataIntView[i] = Number('0x' + arr[i])
+		// dataIntView[i] = arr[i]
   }
   return buffer
 }
+
